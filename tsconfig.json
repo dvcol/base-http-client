@@ -15,7 +15,7 @@
     "declaration": true,
     "noEmit": true,
     "paths": {
-      "@lib/*": ["*"]
+      "~/*": ["./*"]
     }
   },
   "include": ["lib", ".eslintrc.cjs"],

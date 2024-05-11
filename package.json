@@ -1,9 +1,9 @@
 {
-  "name": "@dvcol/typescript-lib-template",
+  "name": "@dvcol/base-http-client",
   "type": "module",
   "version": "1.0.0",
   "packageManager": "pnpm@9.1.0",
-  "description": "<description>",
+  "description": "A simple http client wrapper for making requests",
   "homepage": "https://github.com/dvcol/typescript-lib-template",
   "bugs": "https://github.com/dvcol/typescript-lib-template/issues",
   "keywords": [
@@ -21,14 +21,49 @@
     "node": ">=20",
     "pnpm": ">= 8"
   },
-  "main": "./dist/index.cjs",
-  "module": "./dist/index.js",
-  "types": "./dist/index.d.ts",
+  "main": "./dist/client/base-client.cjs",
+  "module": "./dist/client/base-client.js",
+  "types": "./dist/client/base-client.d.ts",
   "exports": {
     ".": {
-      "require": "./dist/index.cjs",
-      "import": "./dist/index.js",
-      "types": "./dist/index.d.ts"
+      "require": "./dist/client/base-client.cjs",
+      "import": "./dist/client/base-client.js",
+      "types": "./dist/client/base-client.d.ts"
+    },
+    "./utils/cache": {
+      "require": "./dist/utils/cache.utils.cjs",
+      "import": "./dist/utils/cache.utils.js",
+      "types": "./dist/utils/cache.utils.d.ts"
+    },
+    "./utils/fetch": {
+      "require": "./dist/utils/fetch.utils.cjs",
+      "import": "./dist/utils/fetch.utils.js",
+      "types": "./dist/utils/fetch.utils.d.ts"
+    },
+    "./utils/http": {
+      "require": "./dist/utils/http.utils.cjs",
+      "import": "./dist/utils/http.utils.js",
+      "types": "./dist/utils/http.utils.d.ts"
+    },
+    "./utils/observable": {
+      "require": "./dist/utils/observable.utils.cjs",
+      "import": "./dist/utils/observable.utils.js",
+      "types": "./dist/utils/observable.utils.d.ts"
+    },
+    "./utils/regex": {
+      "require": "./dist/utils/regex.utils.cjs",
+      "import": "./dist/utils/regex.utils.js",
+      "types": "./dist/utils/regex.utils.d.ts"
+    },
+    "./utils/test": {
+      "require": "./dist/utils/test.utils.cjs",
+      "import": "./dist/utils/test.utils.js",
+      "types": "./dist/utils/test.utils.d.ts"
+    },
+    "./utils/typescript": {
+      "require": "./dist/utils/typescript.utils.cjs",
+      "import": "./dist/utils/typescript.utils.js",
+      "types": "./dist/utils/typescript.utils.d.ts"
     }
   },
   "files": [
@@ -38,7 +73,7 @@
   ],
   "scripts": {
     "prepare": "husky install",
-    "build": "tsup lib/index.ts --format cjs,esm --dts --clean",
+    "build": "tsup",
     "watch": "npm run build -- --watch lib",
     "lint": "eslint lib",
     "lint:fix": "eslint lib --fix",
