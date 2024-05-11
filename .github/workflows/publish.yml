@@ -24,7 +24,7 @@ on:
 
 jobs:
   publish-npm:
-    name: ☁️ Publish npm
+    name: ☁️ Publish
     runs-on: ubuntu-latest
 
     steps:
@@ -37,9 +37,14 @@ jobs:
       - name: 🚧 Build
         uses: ./.github/actions/build
 
-      - name: ☁️ Publish to npm
+      - name: ☁️ Publish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
           # =================  ☁️ Publish to npm =================
+          # Check status
+          git status
+          git diff --color -U0 | cat
+          
+          # Publish
           pnpm publish
