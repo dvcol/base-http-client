@@ -1,4 +1,4 @@
-name: 📦 Release - Tag, Release and Publish
+name: 📦 Release
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -15,10 +15,6 @@ on:
         description: Skip npm publish
         required: false
         type: boolean
-
-env:
-  node_version: 20.x
-  pnpm_version: 8.x
 
 jobs:
   release:
@@ -39,9 +35,6 @@ jobs:
 
       - name: 🧱 Install
         uses: ./.github/actions/install
-        with:
-          node_version: ${{ env.node_version }}
-          pnpm_version: ${{ env.pnpm_version }}
 
       - name: 🏷️ Release
         run: |
@@ -83,4 +76,3 @@ jobs:
     with:
       commit-hash: ${{ needs.release.outputs.commit-hash }}
       tag-name: ${{ inputs.tag-name || needs.release.outputs.tag-name }}
-      skip-npm: ${{ inputs.skip-npm }}
