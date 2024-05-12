@@ -4,18 +4,20 @@
   "version": "1.1.0",
   "packageManager": "pnpm@9.1.0",
   "description": "A simple http client wrapper for making requests",
-  "homepage": "https://github.com/dvcol/typescript-lib-template",
-  "bugs": "https://github.com/dvcol/typescript-lib-template/issues",
+  "homepage": "https://github.com/dvcol/base-http-client",
+  "bugs": "https://github.com/dvcol/base-http-client/issues",
   "keywords": [
     "typescript",
     "library",
-    "typescript-lib-template"
+    "fetch",
+    "http",
+    "base-http-client"
   ],
   "license": "MIT",
   "author": "dvcol",
   "repository": {
     "type": "git",
-    "url": "https://github.com/dvcol/typescript-lib-template.git"
+    "url": "https://github.com/dvcol/base-http-client.git"
   },
   "engines": {
     "node": ">=20",
