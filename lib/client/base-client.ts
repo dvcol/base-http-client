@@ -19,8 +19,23 @@ export const BaseApiHeaders = {
 } as const;
 
 export const BaseHeaderContentType = {
-  Json: 'application/json',
+  OctetStream: 'application/octet-stream',
   Text: 'text/plain',
+  Css: 'text/css',
+  Html: 'text/html',
+  Javascript: 'text/javascript',
+  Apng: 'image/apng',
+  Avif: 'image/avif',
+  Gif: 'image/gif',
+  Jpeg: 'image/jpeg',
+  Png: 'image/png',
+  Svg: 'image/svg+xml',
+  Webp: 'image/webp',
+  FormData: 'multipart/form-data',
+  ByteRanges: 'multipart/byteranges',
+  Json: 'application/json',
+  Xml: 'application/xml',
+  FormUrlEncoded: 'application/x-www-form-urlencoded',
 } as const;
 
 export type BaseRequest = {
