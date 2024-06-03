@@ -534,9 +534,9 @@ export abstract class BaseClient<
  * @param template - The expected body structure.
  * @param {T} params - The actual parameters.
  *
- * @returns {BodyInit} The parsed request body.
+ * @returns {RecursiveRecord} The parsed request body as a Json Object.
  */
-export const parseBody = <T extends RecursiveRecord = RecursiveRecord>(template: BaseBody<string | keyof T> = {}, params: T): BodyInit => {
+export const parseBodyJson = <T extends RecursiveRecord = RecursiveRecord>(template: BaseBody<string | keyof T> = {}, params: T): RecursiveRecord => {
   const _body: Record<string, string> = {};
 
   Object.entries(params).forEach(([key, value]) => {
@@ -547,7 +547,23 @@ export const parseBody = <T extends RecursiveRecord = RecursiveRecord>(template:
     if (template[key] === true && [undefined, null, ''].includes(params[key])) throw new Error(`Missing mandatory body parameter: '${key}'`);
   });
 
-  return JSON.stringify(_body);
+  return _body;
+};
+
+/**
+ * Parses body from a template and stringifies a {@link BodyInit}
+ *
+ * @private
+ *
+ * @template T - The type of the parameters.
+ *
+ * @param template - The expected body structure.
+ * @param {T} params - The actual parameters.
+ *
+ * @returns {BodyInit} The parsed request body.
+ */
+export const parseBody = <T extends RecursiveRecord = RecursiveRecord>(template: BaseBody<string | keyof T> = {}, params: T): BodyInit => {
+  return JSON.stringify(parseBodyJson(template, params));
 };
 
 /**
