@@ -101,6 +101,8 @@ export type BaseTemplate<P extends RecursiveRecord = RecursiveRecord, O extends 
   validate?: (param: P) => boolean;
   /** Transform the parameters before performing request */
   transform?: (param: P) => P;
+  /** Default seed parameters */
+  seed?: Partial<P>;
 };
 
 export type CacheResponse<T> = {
@@ -145,6 +147,7 @@ export class ClientEndpoint<
   opts: Option;
   body?: BaseBody<string | keyof Parameter>;
   init?: BaseInit;
+  seed?: Partial<Parameter>;
   transform?: (param: Parameter) => Parameter;
   validate?: (param: Parameter) => boolean;
   cached: Cache extends true ? Omit<this, 'cached'> & ClientEndpointCache<Parameter, Response> : never;
@@ -167,6 +170,7 @@ export class ClientEndpoint<
     this.init = template.init ?? {};
     this.body = template.body;
 
+    this.seed = template.seed;
     this.validate = template.validate;
     this.transform = template.transform;
     this.cached = (template.opts?.cache ? this : null) as never;
@@ -366,8 +370,9 @@ export abstract class BaseClient<
         const fn: ClientEndpointCall = (param, init) => this._call(template, param, init);
 
         const cachedFn: ClientEndpointCache = getCachedFunction(fn, {
-          key: (param: unknown, init: unknown) => {
-            const _param = template?.transform?.(param as RecursiveRecord) ?? param;
+          key: (param: Record<string, unknown>, init: Record<string, unknown>) => {
+            const _merged = { ...template.seed, ...param };
+            const _param = template?.transform?.(_merged as RecursiveRecord) ?? _merged;
             return JSON.stringify({ template: template.config, param: _param, init });
           },
           cache: this._cache,
@@ -376,7 +381,8 @@ export abstract class BaseClient<
         });
 
         const parseUrl = (param: Record<string, unknown> = {}) => {
-          const _params = template.transform?.(param) ?? param;
+          const _merged = { ...template.seed, ...param };
+          const _params = template.transform?.(_merged) ?? _merged;
           template.validate?.(_params);
           return this._parseUrl(template, _params);
         };
@@ -437,7 +443,8 @@ export abstract class BaseClient<
     params: P = {} as P,
     init?: BaseInit,
   ): Promise<ResponseType> {
-    const _params = template.transform?.(params) ?? params;
+    const _merged = { ...template.seed, ...params };
+    const _params = template.transform?.(_merged) ?? _merged;
 
     template.validate?.(_params);
 

@@ -46,6 +46,20 @@ const api = {
       },
     },
   }),
+  endpointWithParamsAndSeed: new ClientEndpoint({
+    method: HttpMethod.GET,
+    url: '/endpoint-with-param/:param',
+    opts: {
+      parameters: {
+        path: {
+          param: true,
+        },
+      },
+      seed: {
+        param: 'seeded',
+      },
+    },
+  }),
   endpointWithValidation: new ClientEndpoint({
     method: HttpMethod.GET,
     url: '/endpoint-with-validation/:param',
@@ -608,6 +622,32 @@ describe('base-client.ts', () => {
       const result = await client.publicCall(mockTemplate, mockParams);
 
       expect(spyFetch).toHaveBeenCalledWith(`${mockEndpoint}/movies/requiredPath/popular?requiredQuery=requiredQuery`, {
+        body: '{"requiredBody":"requiredBody"}',
+        headers: {
+          [BaseApiHeaders.ContentType]: BaseHeaderContentType.Json,
+        },
+        method: HttpMethod.POST,
+      });
+
+      expect(result).toBe(response);
+    });
+
+    it('should call an endpoint with seed value', async () => {
+      expect.assertions(2);
+
+      const response = new Response();
+
+      const spyFetch = vi.spyOn(CancellableFetch, 'fetch').mockResolvedValue(response);
+
+      const _template = { ...mockTemplate };
+      _template.seed = { requiredQuery: 'seeded' };
+
+      const _params = { ...mockParams };
+      delete _params.requiredQuery;
+
+      const result = await client.publicCall(_template, _params);
+
+      expect(spyFetch).toHaveBeenCalledWith(`${mockEndpoint}/movies/requiredPath/popular?requiredQuery=seeded`, {
         body: '{"requiredBody":"requiredBody"}',
         headers: {
           [BaseApiHeaders.ContentType]: BaseHeaderContentType.Json,
