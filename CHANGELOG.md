@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.3.0](https://github.com/dvcol/base-http-client/compare/v1.2.0...v1.3.0) (2024-06-04)
+
+
+### Features
+
+* **body:** adds raw json parsing body function ([f75da44](https://github.com/dvcol/base-http-client/commit/f75da441293b0394944f9f75112fa4c61b71a635))
+* **seed:** add parameter seed ([210c33c](https://github.com/dvcol/base-http-client/commit/210c33c240c7f5c1cd4c80612dc5d32efbb14e8f))
+
 ## [1.2.0](https://github.com/dvcol/base-http-client/compare/v1.1.2...v1.2.0) (2024-05-14)
 
 
