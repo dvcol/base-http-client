@@ -2,7 +2,7 @@ import type { CacheStore, CacheStoreEntity } from '~/utils/cache.utils';
 
 import type { RecursiveRecord } from '~/utils/typescript.utils';
 
-import { CancellableFetch, type CancellablePromise } from '~/utils/fetch.utils';
+import { CancellableFetch, CancellablePromise } from '~/utils/fetch.utils';
 import { HttpMethod, type HttpMethods } from '~/utils/http.utils';
 import { Observable, ObservableState, type Observer, type Updater } from '~/utils/observable.utils';
 import { ExactMatchRegex } from '~/utils/regex.utils';
@@ -223,7 +223,7 @@ export const getCachedFunction = <
     retention?: BaseTemplateOptions['cache'];
   },
 ): ClientEndpointCache<Parameter, ResponseBody> => {
-  const cachedFn = async (param: Parameter, init: BaseInit, cacheOptions: BaseCacheOption) => {
+  const cachedFunction = async (param: Parameter, init: BaseInit, cacheOptions: BaseCacheOption) => {
     const _key = typeof key === 'function' ? key(param, init) : key;
     const evict = () => cache.delete(_key);
     const cached = await cache.get(_key);
@@ -255,6 +255,9 @@ export const getCachedFunction = <
       });
   };
 
+  const cacheFn = (param: Parameter, init: BaseInit, cacheOptions: BaseCacheOption) =>
+    CancellablePromise.from(cachedFunction(param, init, cacheOptions));
+
   const evictFn = async (param?: Parameter, init?: BaseInit) => {
     const _key = evictionKey ?? key;
     if (!_key) return;
@@ -264,8 +267,8 @@ export const getCachedFunction = <
     return _resolvedKey;
   };
 
-  Object.defineProperty(cachedFn, 'evict', { value: evictFn });
-  return cachedFn as ClientEndpointCache<Parameter, ResponseBody>;
+  Object.defineProperty(cacheFn, 'evict', { value: evictFn });
+  return cacheFn as ClientEndpointCache<Parameter, ResponseBody>;
 };
 
 /**

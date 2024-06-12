@@ -1,4 +1,4 @@
-import { beforeEach, afterEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import {
   BaseApiHeaders,
@@ -20,7 +20,7 @@ import type { CacheStore } from '~/utils/cache.utils';
 import type { Updater } from '~/utils/observable.utils';
 import type { RecursiveRecord } from '~/utils/typescript.utils';
 
-import { CancellablePromise, CancellableFetch } from '~/utils/fetch.utils';
+import { CancellableFetch, CancellablePromise } from '~/utils/fetch.utils';
 
 import { HttpMethod } from '~/utils/http.utils';
 import { hasOwnProperty } from '~/utils/test.utils';
@@ -287,6 +287,26 @@ describe('base-client.ts', () => {
         expect(result.cache?.isCache).toBeTruthy();
         expect(result.cache?.previous).toBeDefined();
         expect(result.cache?.current).toBeDefined();
+        expect(fetch).toHaveBeenCalledTimes(1);
+        expect(fetch).toHaveBeenCalledWith(new URL('/endpoint-with-cache', mockEndpoint).toString(), payload);
+      });
+
+      it('should cancel cache calls', async () => {
+        expect.assertions(3);
+
+        await client.endpointWithCache.cached();
+
+        spyCacheStore.get.mockImplementationOnce(async (key: string) => {
+          return new Promise(resolve => {
+            setTimeout(() => resolve(cacheStore.get(key)), 500);
+          });
+        });
+        const result$ = client.endpointWithCache.cached();
+
+        result$.cancel();
+
+        await expect(result$).rejects.toThrow('The operation was aborted.');
+
         expect(fetch).toHaveBeenCalledTimes(1);
         expect(fetch).toHaveBeenCalledWith(new URL('/endpoint-with-cache', mockEndpoint).toString(), payload);
       });

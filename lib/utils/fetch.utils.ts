@@ -43,7 +43,16 @@ export class CancellablePromise<T> extends Promise<T> {
     return promise;
   }
 
-  static from<T>(promise: Promise<T>): CancellablePromise<T> {
+  static isCancellable<T>(promise: Promise<T> | CancellablePromise<T>): promise is CancellablePromise<T> {
+    return promise instanceof CancellablePromise || ('cancel' in promise && 'signal' in promise);
+  }
+
+  static resolve<T>(value: T | PromiseLike<T>): CancellablePromise<T> {
+    return CancellablePromise.from(Promise.resolve(value));
+  }
+
+  static from<T>(promise: Promise<T> | CancellablePromise<T>): CancellablePromise<T> {
+    if (CancellablePromise.isCancellable(promise)) return promise as CancellablePromise<T>;
     let _reject: (reason?: any) => void;
     const cancellablePromise = new CancellablePromise<T>((resolve, reject) => {
       _reject = reject;
