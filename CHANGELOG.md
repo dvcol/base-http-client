@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.4.1](https://github.com/dvcol/base-http-client/compare/v1.4.0...v1.4.1) (2024-06-12)
+
+
+### Bug Fixes
+
+* **cache:** return cancellable promise form cache functions ([f32d816](https://github.com/dvcol/base-http-client/commit/f32d81627cbbdf22811a9595431e70453b12bdef))
+
 ## [1.4.0](https://github.com/dvcol/base-http-client/compare/v1.3.0...v1.4.0) (2024-06-12)
 
 
