@@ -2,7 +2,8 @@ import type { CacheStore, CacheStoreEntity } from '~/utils/cache.utils';
 
 import type { RecursiveRecord } from '~/utils/typescript.utils';
 
-import { CancellableFetch, CancellablePromise } from '~/utils/fetch.utils';
+import { CancellablePromise, CancellableFetch } from '~/utils/fetch.utils';
+
 import { HttpMethod, type HttpMethods } from '~/utils/http.utils';
 import { Observable, ObservableState, type Observer, type Updater } from '~/utils/observable.utils';
 import { ExactMatchRegex } from '~/utils/regex.utils';
@@ -223,29 +224,58 @@ export const getCachedFunction = <
     retention?: BaseTemplateOptions['cache'];
   },
 ): ClientEndpointCache<Parameter, ResponseBody> => {
-  const cachedFunction = async (param: Parameter, init: BaseInit, cacheOptions: BaseCacheOption) => {
-    const _key = typeof key === 'function' ? key(param, init) : key;
-    const evict = () => cache.delete(_key);
-    const cached = await cache.get(_key);
-    if (cached && !cacheOptions?.force) {
-      let templateRetention = typeof retention === 'number' ? retention : undefined;
-      if (typeof retention === 'object') templateRetention = retention.retention;
-      const _retention = cacheOptions?.retention ?? templateRetention ?? cache.retention;
-      if (!_retention) return cloneResponse<ResponseType>(cached.value, { previous: cached, current: cached, isCache: true, evict });
-      const expires = cached.cachedAt + _retention;
-      if (expires > Date.now()) return cloneResponse(cached.value, { previous: cached, current: cached, isCache: true, evict });
+  const restoreCache = async ({
+    cacheKey,
+    cacheOptions,
+    evict,
+  }: {
+    cacheKey: string;
+    cacheOptions: BaseCacheOption;
+    evict: TypedResponse<ResponseType>['cache']['evict'];
+  }) => {
+    if (cacheOptions?.force) return {};
+
+    const cached = await cache.get(cacheKey);
+    if (!cached) return {};
+
+    let templateRetention = typeof retention === 'number' ? retention : undefined;
+    if (typeof retention === 'object') templateRetention = retention.retention;
+
+    const _retention = cacheOptions?.retention ?? templateRetention ?? cache.retention;
+    const expires = cached.cachedAt + _retention;
+    let response: TypedResponse<ResponseType>;
+
+    if (!_retention || expires > Date.now()) {
+      response = cloneResponse<ResponseType>(cached.value, { previous: cached, current: cached, isCache: true, evict });
     }
 
-    return clientFn(param, init)
+    return { cached, response };
+  };
+
+  const fetchNewData = (
+    { param, init }: { param: Parameter; init: BaseInit },
+    {
+      cacheKey,
+      cacheOptions,
+      cached,
+      evict,
+    }: {
+      cacheKey: string;
+      cacheOptions: BaseCacheOption;
+      cached: CacheStoreEntity<ResponseType>;
+      evict: TypedResponse<ResponseType>['cache']['evict'];
+    },
+  ): CancellablePromise<TypedResponse<ResponseBody>> =>
+    clientFn(param, init)
       .then(async (result: TypedResponse<ResponseBody>) => {
         const cacheEntry: CacheStoreEntity<ResponseType> = {
           cachedAt: Date.now(),
           value: cloneResponse(result) as ResponseType,
-          key: _key,
+          key: cacheKey,
         };
-        await cache.set(_key, cacheEntry);
+        await cache.set(cacheKey, cacheEntry);
         result.cache = { previous: cached, current: cacheEntry, isCache: false, evict };
-        return result;
+        return result as unknown as TypedResponse<ResponseType>;
       })
       .catch(error => {
         if (cacheOptions?.evictOnError ?? (typeof retention === 'object' ? retention?.evictOnError : undefined) ?? cache.evictOnError) {
@@ -253,10 +283,28 @@ export const getCachedFunction = <
         }
         throw error;
       });
-  };
 
-  const cacheFn = (param: Parameter, init: BaseInit, cacheOptions: BaseCacheOption) =>
-    CancellablePromise.from(cachedFunction(param, init, cacheOptions));
+  const cacheFn = (param: Parameter, init: BaseInit, cacheOptions: BaseCacheOption): CancellablePromise<TypedResponse<Response>> => {
+    const cacheKey = typeof key === 'function' ? key(param, init) : key;
+    const evict = () => cache.delete(cacheKey);
+
+    let innerPromise$: CancellablePromise<TypedResponse<ResponseBody>> | undefined;
+    const promise$: CancellablePromise<TypedResponse<ResponseType>> = CancellablePromise.from(restoreCache({ cacheKey, cacheOptions, evict })).then(
+      ({ cached, response }) => {
+        if (response) return response;
+        innerPromise$ = fetchNewData({ param, init }, { cacheKey, cacheOptions, cached, evict });
+        return innerPromise$;
+      },
+    );
+
+    const _cancel = promise$.cancel;
+    promise$.cancel = (reason?: unknown) => {
+      innerPromise$?.cancel(reason);
+      return _cancel(reason);
+    };
+
+    return promise$;
+  };
 
   const evictFn = async (param?: Parameter, init?: BaseInit) => {
     const _key = evictionKey ?? key;

@@ -36,7 +36,7 @@ describe('fetch.utils.ts', () => {
 
     fetch.cancel();
 
-    expect(spyAbortController).toHaveBeenCalledWith();
+    expect(spyAbortController).toHaveBeenCalledWith(undefined);
   });
 
   it('should create a new instance and execute from static fetch', async () => {

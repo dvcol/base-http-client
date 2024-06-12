@@ -193,7 +193,8 @@ describe('base-client.ts', () => {
   };
 
   const client: TestableBaseClient = new TestableBaseClient({ endpoint: 'http://my-endpoint', cacheStore });
-  const fetch = vi.spyOn(CancellableFetch, 'fetch').mockResolvedValue(new Response());
+  const response = new Response();
+  const fetch = vi.spyOn(CancellableFetch, 'fetch').mockResolvedValue(response);
 
   const payload = {
     headers: {
@@ -309,6 +310,29 @@ describe('base-client.ts', () => {
 
         expect(fetch).toHaveBeenCalledTimes(1);
         expect(fetch).toHaveBeenCalledWith(new URL('/endpoint-with-cache', mockEndpoint).toString(), payload);
+      });
+
+      it('should cancel uncached calls', async () => {
+        expect.assertions(2);
+
+        fetch.mockImplementationOnce(() => {
+          const promise = new Promise<Response>(resolve => {
+            setTimeout(() => resolve(response), 1000);
+          });
+          return CancellablePromise.from(promise);
+        });
+
+        const result$ = client.endpointWithCache.cached();
+
+        await new Promise(resolve => {
+          setTimeout(resolve, 0);
+        });
+
+        result$.cancel();
+
+        await expect(result$).rejects.toThrow('The operation was aborted.');
+
+        expect(fetch).toHaveBeenCalledTimes(1);
       });
 
       it('should ignore cache if cache cleared', async () => {
@@ -636,8 +660,6 @@ describe('base-client.ts', () => {
     it('should call an endpoint', async () => {
       expect.assertions(2);
 
-      const response = new Response();
-
       const spyFetch = vi.spyOn(CancellableFetch, 'fetch').mockResolvedValue(response);
 
       const result = await client.publicCall(mockTemplate, mockParams);
@@ -655,8 +677,6 @@ describe('base-client.ts', () => {
 
     it('should cancel a call to an endpoint', async () => {
       expect.assertions(2);
-
-      const response = new Response();
 
       const spyFetch = vi.spyOn(CancellableFetch, 'fetch').mockImplementation(() => {
         const promise = new Promise<Response>(resolve => {
@@ -682,8 +702,6 @@ describe('base-client.ts', () => {
 
     it('should call an endpoint with seed value', async () => {
       expect.assertions(2);
-
-      const response = new Response();
 
       const spyFetch = vi.spyOn(CancellableFetch, 'fetch').mockResolvedValue(response);
 
