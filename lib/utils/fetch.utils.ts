@@ -3,11 +3,57 @@
  *
  * @template T - The type of the promise result.
  */
-export type CancellablePromise<T> = Omit<Promise<T>, 'then'> & {
-  signal: AbortSignal;
-  cancel(): void;
-  then(...params: Parameters<Promise<T>['then']>): CancellablePromise<T>;
-};
+export class CancellablePromise<T> extends Promise<T> {
+  private readonly _controller = new AbortController();
+
+  /**
+   * Gets the AbortSignal associated with the AbortController, allowing external code to listen for cancellation events.
+   *
+   * @type {AbortSignal}
+   * @memberof CancellableFetch
+   */
+  get signal() {
+    return this._controller.signal;
+  }
+
+  /**
+   * Sets the AbortSignal associated with the AbortController, allowing external code to listen for cancellation events.
+   * @param signal - The AbortSignal to associate with the AbortController.
+   *
+   * @memberof CancellableFetch
+   */
+  set signal(signal: AbortSignal) {
+    this._controller.signal.onabort = signal.onabort;
+  }
+
+  /**
+   * Cancels the currently active fetch request by aborting the associated AbortController.
+   *
+   * @memberof CancellableFetch
+   */
+  cancel() {
+    this._controller.abort();
+  }
+
+  // @ts-expect-error - This method is intentionally overridden to return a CancellablePromise.
+  then(...params: Parameters<Promise<T>['then']>): CancellablePromise<T> {
+    const promise = super.then(...params) as CancellablePromise<T>;
+    promise.cancel = () => this.cancel();
+    promise.signal = this.signal;
+    return promise;
+  }
+
+  static from<T>(promise: Promise<T>): CancellablePromise<T> {
+    let _reject: (reason?: any) => void;
+    const cancellablePromise = new CancellablePromise<T>((resolve, reject) => {
+      _reject = reject;
+      promise.then(resolve).catch(reject);
+    });
+    const onAbort = () => _reject(new DOMException('The operation was aborted.', 'AbortError'));
+    cancellablePromise.signal.addEventListener('abort', onAbort);
+    return cancellablePromise;
+  }
+}
 
 /**
  * A wrapper class for making cancellable fetch requests using the Fetch API.

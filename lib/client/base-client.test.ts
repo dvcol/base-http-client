@@ -16,11 +16,12 @@ import {
 } from './base-client';
 
 import type { CacheStore } from '~/utils/cache.utils';
-import type { CancellablePromise } from '~/utils/fetch.utils';
+
 import type { Updater } from '~/utils/observable.utils';
 import type { RecursiveRecord } from '~/utils/typescript.utils';
 
-import { CancellableFetch } from '~/utils/fetch.utils';
+import { CancellablePromise, CancellableFetch } from '~/utils/fetch.utils';
+
 import { HttpMethod } from '~/utils/http.utils';
 import { hasOwnProperty } from '~/utils/test.utils';
 
@@ -177,7 +178,7 @@ class TestableBaseClient extends BaseClient implements IEndpoints {
     return _response;
   }
 
-  publicCall<T extends RecursiveRecord = RecursiveRecord>(template: BaseTemplate<T>, params: T): Promise<Response> {
+  publicCall<T extends RecursiveRecord = RecursiveRecord>(template: BaseTemplate<T>, params: T): CancellablePromise<Response> {
     return this._call(template, params);
   }
 }
@@ -630,6 +631,33 @@ describe('base-client.ts', () => {
       });
 
       expect(result).toBe(response);
+    });
+
+    it('should cancel a call to an endpoint', async () => {
+      expect.assertions(2);
+
+      const response = new Response();
+
+      const spyFetch = vi.spyOn(CancellableFetch, 'fetch').mockImplementation(() => {
+        const promise = new Promise<Response>(resolve => {
+          setTimeout(() => resolve(response), 500);
+        });
+        return CancellablePromise.from(promise);
+      });
+
+      const result$ = client.publicCall(mockTemplate, mockParams);
+
+      result$.cancel();
+
+      expect(spyFetch).toHaveBeenCalledWith(`${mockEndpoint}/movies/requiredPath/popular?requiredQuery=requiredQuery`, {
+        body: '{"requiredBody":"requiredBody"}',
+        headers: {
+          [BaseApiHeaders.ContentType]: BaseHeaderContentType.Json,
+        },
+        method: HttpMethod.POST,
+      });
+
+      await expect(result$).rejects.toThrow('The operation was aborted.');
     });
 
     it('should call an endpoint with seed value', async () => {

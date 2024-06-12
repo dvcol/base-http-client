@@ -122,17 +122,17 @@ export type ResponseOrTypedResponse<T = unknown> = T extends never ? Response : 
 type ClientEndpointCall<Parameter extends RecursiveRecord = Record<string, never>, Response = unknown> = (
   param?: Parameter,
   init?: BaseInit,
-) => Promise<ResponseOrTypedResponse<Response>>;
+) => CancellablePromise<ResponseOrTypedResponse<Response>>;
 
 export interface ClientEndpoint<Parameter extends RecursiveRecord = Record<string, never>, Response = unknown> {
-  (param?: Parameter, init?: BaseInit): Promise<ResponseOrTypedResponse<Response>>;
+  (param?: Parameter, init?: BaseInit): CancellablePromise<ResponseOrTypedResponse<Response>>;
 }
 
 export type BaseCacheOption = { force?: boolean; retention?: number; evictOnError?: boolean };
 
 type ClientEndpointCache<Parameter extends RecursiveRecord = Record<string, never>, Response = unknown> = {
   evict: (param?: Parameter, init?: BaseInit) => Promise<string | undefined>;
-} & ((param?: Parameter, init?: BaseInit, cacheOptions?: BaseCacheOption) => Promise<TypedResponse<Response>>);
+} & ((param?: Parameter, init?: BaseInit, cacheOptions?: BaseCacheOption) => CancellablePromise<TypedResponse<Response>>);
 
 // eslint-disable-next-line @typescript-eslint/no-unsafe-declaration-merging
 export class ClientEndpoint<
@@ -236,22 +236,23 @@ export const getCachedFunction = <
       if (expires > Date.now()) return cloneResponse(cached.value, { previous: cached, current: cached, isCache: true, evict });
     }
 
-    try {
-      const result: TypedResponse<ResponseBody> = await clientFn(param, init);
-      const cacheEntry: CacheStoreEntity<ResponseType> = {
-        cachedAt: Date.now(),
-        value: cloneResponse(result) as ResponseType,
-        key: _key,
-      };
-      await cache.set(_key, cacheEntry);
-      result.cache = { previous: cached, current: cacheEntry, isCache: false, evict };
-      return result;
-    } catch (error) {
-      if (cacheOptions?.evictOnError ?? (typeof retention === 'object' ? retention?.evictOnError : undefined) ?? cache.evictOnError) {
-        evict();
-      }
-      throw error;
-    }
+    return clientFn(param, init)
+      .then(async (result: TypedResponse<ResponseBody>) => {
+        const cacheEntry: CacheStoreEntity<ResponseType> = {
+          cachedAt: Date.now(),
+          value: cloneResponse(result) as ResponseType,
+          key: _key,
+        };
+        await cache.set(_key, cacheEntry);
+        result.cache = { previous: cached, current: cacheEntry, isCache: false, evict };
+        return result;
+      })
+      .catch(error => {
+        if (cacheOptions?.evictOnError ?? (typeof retention === 'object' ? retention?.evictOnError : undefined) ?? cache.evictOnError) {
+          evict();
+        }
+        throw error;
+      });
   };
 
   const evictFn = async (param?: Parameter, init?: BaseInit) => {
@@ -438,11 +439,11 @@ export abstract class BaseClient<
    *
    * @protected
    */
-  protected async _call<P extends RecursiveRecord = RecursiveRecord>(
+  protected _call<P extends RecursiveRecord = RecursiveRecord>(
     template: BaseTemplate<P>,
     params: P = {} as P,
     init?: BaseInit,
-  ): Promise<ResponseType> {
+  ): CancellablePromise<ResponseType> {
     const _merged = { ...template.seed, ...params };
     const _params = template.transform?.(_merged) ?? _merged;
 
