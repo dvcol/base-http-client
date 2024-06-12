@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.4.0](https://github.com/dvcol/base-http-client/compare/v1.3.0...v1.4.0) (2024-06-12)
+
+
+### Features
+
+* **client:** expose cancellable api to downstream clients ([a7d525e](https://github.com/dvcol/base-http-client/commit/a7d525e7defeaf87f1b8d5fb03c8642055e1ac4e))
+
 ## [1.3.0](https://github.com/dvcol/base-http-client/compare/v1.2.0...v1.3.0) (2024-06-04)
 
 
