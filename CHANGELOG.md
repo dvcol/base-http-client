@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.5.1](https://github.com/dvcol/base-http-client/compare/v1.5.0...v1.5.1) (2024-06-13)
+
+
+### Bug Fixes
+
+* **build:** exclude spec from bundle ([2445d06](https://github.com/dvcol/base-http-client/commit/2445d06cc6cc60f2d2898deb5f6267982f5b8cda))
+
 ## [1.5.0](https://github.com/dvcol/base-http-client/compare/v1.4.2...v1.5.0) (2024-06-13)
 
 
