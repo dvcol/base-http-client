@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.5.0](https://github.com/dvcol/base-http-client/compare/v1.4.2...v1.5.0) (2024-06-13)
+
+
+### Features
+
+* **deps:** move to common-utils package ([3c4880b](https://github.com/dvcol/base-http-client/commit/3c4880b387f9b761b05ed70e12d98cff0cd4a257))
+
 ### [1.4.2](https://github.com/dvcol/base-http-client/compare/v1.4.1...v1.4.2) (2024-06-12)
 
 
