@@ -1,3 +1,4 @@
+import { CancellableFetch, CancellablePromise, HttpMethod } from '@dvcol/common-utils';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import {
@@ -15,14 +16,8 @@ import {
   type ResponseOrTypedResponse,
 } from './base-client';
 
-import type { CacheStore } from '~/utils/cache.utils';
+import type { CacheStore, RecursiveRecord, Updater } from '@dvcol/common-utils';
 
-import type { Updater } from '~/utils/observable.utils';
-import type { RecursiveRecord } from '~/utils/typescript.utils';
-
-import { CancellableFetch, CancellablePromise } from '~/utils/fetch.utils';
-
-import { HttpMethod } from '~/utils/http.utils';
 import { hasOwnProperty } from '~/utils/test.utils';
 
 const mockEndpoint = 'https://api-endpoint.url';

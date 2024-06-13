@@ -1,6 +1,6 @@
 import { expect } from 'vitest';
 
-import type { RecursiveRecord } from '~/utils/typescript.utils';
+import type { RecursiveRecord } from '@dvcol/common-utils';
 
 import { type BaseTemplate, ClientEndpoint } from '~/client/base-client';
 

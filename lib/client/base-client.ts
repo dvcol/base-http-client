@@ -1,11 +1,7 @@
-import type { CacheStore, CacheStoreEntity } from '~/utils/cache.utils';
+import { Observable, ObservableState, CancellableFetch, CancellablePromise, HttpMethod } from '@dvcol/common-utils';
 
-import type { RecursiveRecord } from '~/utils/typescript.utils';
+import type { CacheStore, CacheStoreEntity, HttpMethods, Observer, RecursiveRecord, Updater } from '@dvcol/common-utils';
 
-import { CancellablePromise, CancellableFetch } from '~/utils/fetch.utils';
-
-import { HttpMethod, type HttpMethods } from '~/utils/http.utils';
-import { Observable, ObservableState, type Observer, type Updater } from '~/utils/observable.utils';
 import { ExactMatchRegex } from '~/utils/regex.utils';
 
 export const BaseApiHeaders = {
