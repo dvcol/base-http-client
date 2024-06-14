@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.7.1](https://github.com/dvcol/base-http-client/compare/v1.7.0...v1.7.1) (2024-06-14)
+
+
+### Bug Fixes
+
+* **type:** loosen typing to make extending easier ([6253f64](https://github.com/dvcol/base-http-client/commit/6253f64dd9328e2401a1ff26c236c3388bfaab45))
+
 ## [1.7.0](https://github.com/dvcol/base-http-client/compare/v1.6.0...v1.7.0) (2024-06-14)
 
 
