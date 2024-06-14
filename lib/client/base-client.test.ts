@@ -1,22 +1,18 @@
 import { CancellableFetch, CancellablePromise, HttpMethod } from '@dvcol/common-utils';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import {
-  BaseApiHeaders,
-  type BaseBody,
-  type BaseInit,
-  BaseClient,
-  BaseHeaderContentType,
-  type BaseOptions,
-  type BaseQuery,
-  type BaseTemplate,
-  ClientEndpoint,
-  type IApi,
-  parseBody,
-  parseUrl,
-  type ResponseOrTypedResponse,
-  type BaseTemplateOptions,
-  type BaseTransformed,
+import { BaseApiHeaders, BaseClient, BaseHeaderContentType, ClientEndpoint, parseBody, parseUrl } from './base-client';
+
+import type {
+  BaseBody,
+  BaseInit,
+  BaseOptions,
+  BaseQuery,
+  BaseTemplate,
+  IApi,
+  ResponseOrTypedResponse,
+  BaseTemplateOptions,
+  BaseTransformed,
 } from './base-client';
 
 import type { CacheStore, RecursiveRecord, Updater } from '@dvcol/common-utils';
@@ -181,8 +177,8 @@ class TestableBaseClient extends BaseClient implements IEndpoints {
   }
 
   // eslint-disable-next-line class-methods-use-this -- abstract method
-  _parseResponse(_response: Response): Response {
-    return _response;
+  _parseResponse(response: Response): Response {
+    return response;
   }
 
   publicCall<T extends RecursiveRecord = RecursiveRecord>(template: BaseTemplate<T>, params: T): CancellablePromise<Response> {
@@ -761,6 +757,40 @@ describe('base-client.ts', () => {
         method: HttpMethod.POST,
       });
 
+      expect(result).toBe(response);
+    });
+  });
+
+  describe('parseResponse', () => {
+    it('should parse the response with additional context', async () => {
+      expect.assertions(3);
+
+      const request = {
+        init: {
+          body: '{"requiredBody":"requiredBody"}',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          method: 'POST',
+        },
+        input: 'https://api-endpoint.url/movies/requiredPath/popular?requiredQuery=requiredQuery',
+      };
+
+      const spyParseResponse = vi.spyOn(client, '_parseResponse');
+
+      const spyFetch = vi.spyOn(CancellableFetch, 'fetch').mockResolvedValue(response);
+
+      const result = await client.publicCall(mockTemplate, mockParams);
+
+      expect(spyFetch).toHaveBeenCalledWith(`${mockEndpoint}/movies/requiredPath/popular?requiredQuery=requiredQuery`, {
+        body: '{"requiredBody":"requiredBody"}',
+        headers: {
+          [BaseApiHeaders.ContentType]: BaseHeaderContentType.Json,
+        },
+        method: HttpMethod.POST,
+      });
+
+      expect(spyParseResponse).toHaveBeenCalledWith(response, request, mockTemplate);
       expect(result).toBe(response);
     });
   });

@@ -504,7 +504,7 @@ export abstract class BaseClient<
 
     _template.validate?.(_transformed);
 
-    const req: BaseRequest = {
+    const request: BaseRequest = {
       input: this._parseUrl(_template, _transformed).toString(),
       init: {
         ..._template.init,
@@ -519,12 +519,15 @@ export abstract class BaseClient<
     };
 
     if (_template.method !== HttpMethod.GET && _template.body) {
-      req.init.body = this._parseBody(_template.body, _params);
+      request.init.body = this._parseBody(_template.body, _params);
     }
 
-    const query = CancellableFetch.fetch<ResponseType>(req.input, req.init).then(this._parseResponse ?? (response => response));
+    const responseHandler = this._parseResponse
+      ? (_res: ResponseType) => this._parseResponse(_res, request, _template)
+      : (_res: ResponseType) => _res;
+    const query = CancellableFetch.fetch<ResponseType>(request.input, request.init).then(responseHandler);
 
-    this._callListeners.update({ request: req, query } as QueryType);
+    this._callListeners.update({ request, query } as QueryType);
 
     return query;
   }
@@ -598,12 +601,18 @@ export abstract class BaseClient<
   /**
    * Parses the response from the API before returning from the call.
    * @param response - The response from the API.
+   * @param request - The request information.
+   * @param template - The template for the API endpoint.
    *
    * @returns {Response} The parsed response.
    *
    * @protected
    */
-  protected abstract _parseResponse?(response: Response): Response;
+  protected abstract _parseResponse?<T extends RecursiveRecord = RecursiveRecord>(
+    response: Response,
+    request?: BaseRequest,
+    template?: BaseTemplate<T>,
+  ): Response;
 }
 
 /**
