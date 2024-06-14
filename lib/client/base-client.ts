@@ -532,13 +532,13 @@ export abstract class BaseClient<
   /**
    * Transforms the parameters templates or init before performing a request.
    *
-   * @template P - The type of the parameters.
+   * @template T - The type of the parameters.
    *
-   * @param {BaseTemplate<P>} template - The template for the API endpoint.
-   * @param {P} params - The actual parameters.
+   * @param {BaseTemplate<T>} template - The template for the API endpoint.
+   * @param {T} params - The actual parameters.
    * @param {BaseInit} [init] - Additional initialization options.
    *
-   * @returns {{ _template: BaseTemplate<P>; _params: P; _init: BaseInit }} The transformed template.
+   * @returns {{ template: BaseTemplate<T>; params: T; init: BaseInit }} The transformed template.
    *
    * @protected
    */
