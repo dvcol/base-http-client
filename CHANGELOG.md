@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.7.0](https://github.com/dvcol/base-http-client/compare/v1.6.0...v1.7.0) (2024-06-14)
+
+
+### Features
+
+* **base-client:** adds generic transform method to mutate template ([41bd812](https://github.com/dvcol/base-http-client/commit/41bd81220054b83ebfdd8c518028c937f8a307c0))
+
 ## [1.6.0](https://github.com/dvcol/base-http-client/compare/v1.5.1...v1.6.0) (2024-06-14)
 
 
