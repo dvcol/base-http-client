@@ -542,11 +542,11 @@ export abstract class BaseClient<
    *
    * @protected
    */
-  protected abstract _transform?<P extends RecursiveRecord = RecursiveRecord, O extends BaseTemplateOptions = BaseTemplateOptions>(
-    template: BaseTemplate<P, O>,
-    params: P,
+  protected abstract _transform?<T extends RecursiveRecord = RecursiveRecord>(
+    template: BaseTemplate<T>,
+    params: T,
     init?: BaseInit,
-  ): BaseTransformed<P, O>;
+  ): BaseTransformed<T>;
 
   /**
    * Parses headers from a template and returns a {@link HeadersInit}
@@ -561,10 +561,7 @@ export abstract class BaseClient<
    * @protected
    * @abstract
    */
-  protected abstract _parseHeaders?<T extends RecursiveRecord = RecursiveRecord, O extends BaseTemplateOptions = BaseTemplateOptions>(
-    template: BaseTemplate<T, O>,
-    params: T,
-  ): HeadersInit;
+  protected abstract _parseHeaders?<T extends RecursiveRecord = RecursiveRecord>(template: BaseTemplate<T>, params: T): HeadersInit;
 
   /**
    * Parses the parameters and constructs the URL for a API request.
@@ -581,10 +578,7 @@ export abstract class BaseClient<
    * @protected
    * @abstract
    */
-  protected abstract _parseUrl<T extends RecursiveRecord = RecursiveRecord, O extends BaseTemplateOptions = BaseTemplateOptions>(
-    template: BaseTemplate<T, O>,
-    params: T,
-  ): URL;
+  protected abstract _parseUrl<T extends RecursiveRecord = RecursiveRecord>(template: BaseTemplate<T>, params: T): URL;
 
   /**
    * Parses body from a template and stringifies a {@link BodyInit}
