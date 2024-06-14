@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.8.0](https://github.com/dvcol/base-http-client/compare/v1.7.1...v1.8.0) (2024-06-14)
+
+
+### Features
+
+* **base-client:** pass additional context to parse response ([9b10d59](https://github.com/dvcol/base-http-client/commit/9b10d5934714da197b89a3a4a578cb8cea526482))
+
 ### [1.7.1](https://github.com/dvcol/base-http-client/compare/v1.7.0...v1.7.1) (2024-06-14)
 
 
