@@ -630,7 +630,7 @@ export const parseBody = <T extends RecursiveRecord = RecursiveRecord>(template:
  *
  * @param {BaseTemplate<P>} template - The template for the API endpoint.
  * @param {P} params - The parameters for the API call.
- * @param {string} endpoint - The API endpoint.
+ * @param {string} base - The API base url.
  *
  * @returns {URL} The URL for the  API request.
  *
@@ -639,14 +639,13 @@ export const parseBody = <T extends RecursiveRecord = RecursiveRecord>(template:
 export const parseUrl = <P extends RecursiveRecord = RecursiveRecord, O extends BaseTemplateOptions = BaseTemplateOptions>(
   template: BaseTemplate<P, O>,
   params: P,
-  endpoint: string,
+  base: string,
 ): URL => {
-  // fill query parameters i.e. ?variable
   const [pathPart, queryPart] = template.url.split('?');
 
   let path = pathPart;
 
-  // fill query path parameter i.e :variable
+  // fill path parameter i.e /path/:variable/...
   if (pathPart.includes(':')) {
     path = pathPart
       .split('/')
@@ -665,22 +664,30 @@ export const parseUrl = <P extends RecursiveRecord = RecursiveRecord, O extends 
       .join('/');
   }
 
-  const url = new URL(path, endpoint);
+  const url = new URL(path, base);
 
-  if (queryPart) {
-    new URLSearchParams(queryPart).forEach((value, key) => {
-      const _value = params[key] ?? value;
-
-      // If a value is found we encode
-      if (![undefined, null, ''].includes(_value)) {
-        url.searchParams.set(key, typeof _value === 'object' ? JSON.stringify(_value) : _value);
-      }
-      // If the parameter is required we raise error
-      else if (template.opts?.parameters?.query?.[key] === true) {
-        throw Error(`Missing mandatory query parameter: '${key}'`);
-      }
+  // fill query parameter i.e /path?param#&param2
+  const queryParams = new URLSearchParams(queryPart);
+  const queryTemplate = template.opts?.parameters?.query;
+  if (queryTemplate) {
+    Object.keys(queryTemplate).forEach(key => {
+      if (!queryParams.has(key)) queryParams.set(key, '');
     });
   }
+
+  queryParams.forEach((value, key) => {
+    const _value = params[key] ?? value;
+
+    // If a value is found we encode
+    if (![undefined, null, ''].includes(_value)) {
+      url.searchParams.set(key, typeof _value === 'object' ? JSON.stringify(_value) : _value);
+    }
+    // If the parameter is required we raise error
+    else if (template.opts?.parameters?.query?.[key] === true) {
+      throw Error(`Missing mandatory query parameter: '${key}'`);
+    }
+  });
+
   return url;
 };
 

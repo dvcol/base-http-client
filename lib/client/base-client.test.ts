@@ -649,6 +649,19 @@ describe('base-client.ts', () => {
       const testFunction = () => parseUrl(mockTemplate, { ...mockParams, requiredPath: '' }, mockEndpoint);
       expect(testFunction).toThrow("Missing mandatory path parameter: 'requiredPath'");
     });
+
+    it('should inject param from template and not url', async () => {
+      expect.assertions(2);
+
+      const result = parseUrl(
+        { ...mockTemplate, url: '/movies/:requiredPath/:optionalPath/popular?additional' },
+        { ...mockParams, optionalQuery: 'optionalQuery' },
+        mockEndpoint,
+      );
+
+      expect(result).toBeInstanceOf(URL);
+      expect(result?.toString()).toBe(`${mockEndpoint}/movies/requiredPath/popular?requiredQuery=requiredQuery&optionalQuery=optionalQuery`);
+    });
   });
 
   describe('call', () => {
