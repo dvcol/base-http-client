@@ -102,6 +102,12 @@ export type BaseTemplate<P extends RecursiveRecord = RecursiveRecord, O extends 
   seed?: Partial<P>;
 };
 
+export type BaseTransformed<P extends RecursiveRecord = RecursiveRecord, O extends BaseTemplateOptions = BaseTemplateOptions> = {
+  template: BaseTemplate<P, O>;
+  params: P;
+  init: BaseInit;
+};
+
 export type CacheResponse<T> = {
   previous?: CacheStoreEntity<TypedResponse<T>>;
   current?: CacheStoreEntity<TypedResponse<T>>;
@@ -486,32 +492,34 @@ export abstract class BaseClient<
    *
    * @protected
    */
-  protected _call<P extends RecursiveRecord = RecursiveRecord>(
-    template: BaseTemplate<P>,
+  protected _call<P extends RecursiveRecord = RecursiveRecord, O extends BaseTemplateOptions = BaseTemplateOptions>(
+    template: BaseTemplate<P, O>,
     params: P = {} as P,
     init?: BaseInit,
   ): CancellablePromise<ResponseType> {
-    const _merged = { ...template.seed, ...params };
-    const _params = template.transform?.(_merged) ?? _merged;
+    const { template: _template = template, params: _params = params, init: _init = init } = this._transform?.(template, params, init) ?? {};
 
-    template.validate?.(_params);
+    const _merged = { ..._template.seed, ...params };
+    const _transformed = _template.transform?.(_merged) ?? _merged;
+
+    _template.validate?.(_transformed);
 
     const req: BaseRequest = {
-      input: this._parseUrl(template, _params).toString(),
+      input: this._parseUrl(_template, _transformed).toString(),
       init: {
-        ...template.init,
-        ...init,
-        method: template.method,
+        ..._template.init,
+        ..._init,
+        method: _template.method,
         headers: {
-          ...template.init?.headers,
-          ...this._parseHeaders?.(template, _params),
-          ...init?.headers,
+          ..._template.init?.headers,
+          ...this._parseHeaders?.(_template, _transformed),
+          ..._init?.headers,
         },
       },
     };
 
-    if (template.method !== HttpMethod.GET && template.body) {
-      req.init.body = this._parseBody(template.body, _params);
+    if (_template.method !== HttpMethod.GET && _template.body) {
+      req.init.body = this._parseBody(_template.body, _params);
     }
 
     const query = CancellableFetch.fetch<ResponseType>(req.input, req.init).then(this._parseResponse ?? (response => response));
@@ -520,6 +528,25 @@ export abstract class BaseClient<
 
     return query;
   }
+
+  /**
+   * Transforms the parameters templates or init before performing a request.
+   *
+   * @template P - The type of the parameters.
+   *
+   * @param {BaseTemplate<P>} template - The template for the API endpoint.
+   * @param {P} params - The actual parameters.
+   * @param {BaseInit} [init] - Additional initialization options.
+   *
+   * @returns {{ _template: BaseTemplate<P>; _params: P; _init: BaseInit }} The transformed template.
+   *
+   * @protected
+   */
+  protected abstract _transform?<P extends RecursiveRecord = RecursiveRecord, O extends BaseTemplateOptions = BaseTemplateOptions>(
+    template: BaseTemplate<P, O>,
+    params: P,
+    init?: BaseInit,
+  ): BaseTransformed<P, O>;
 
   /**
    * Parses headers from a template and returns a {@link HeadersInit}
@@ -534,7 +561,10 @@ export abstract class BaseClient<
    * @protected
    * @abstract
    */
-  protected abstract _parseHeaders?<T extends RecursiveRecord = RecursiveRecord>(template: BaseTemplate<T>, params: T): HeadersInit;
+  protected abstract _parseHeaders?<T extends RecursiveRecord = RecursiveRecord, O extends BaseTemplateOptions = BaseTemplateOptions>(
+    template: BaseTemplate<T, O>,
+    params: T,
+  ): HeadersInit;
 
   /**
    * Parses the parameters and constructs the URL for a API request.
@@ -551,7 +581,10 @@ export abstract class BaseClient<
    * @protected
    * @abstract
    */
-  protected abstract _parseUrl<T extends RecursiveRecord = RecursiveRecord>(template: BaseTemplate<T>, params: T): URL;
+  protected abstract _parseUrl<T extends RecursiveRecord = RecursiveRecord, O extends BaseTemplateOptions = BaseTemplateOptions>(
+    template: BaseTemplate<T, O>,
+    params: T,
+  ): URL;
 
   /**
    * Parses body from a template and stringifies a {@link BodyInit}

@@ -4,6 +4,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import {
   BaseApiHeaders,
   type BaseBody,
+  type BaseInit,
   BaseClient,
   BaseHeaderContentType,
   type BaseOptions,
@@ -14,6 +15,8 @@ import {
   parseBody,
   parseUrl,
   type ResponseOrTypedResponse,
+  type BaseTemplateOptions,
+  type BaseTransformed,
 } from './base-client';
 
 import type { CacheStore, RecursiveRecord, Updater } from '@dvcol/common-utils';
@@ -149,6 +152,15 @@ class TestableBaseClient extends BaseClient implements IEndpoints {
 
   publicUpdateAuth(auth: Updater<TestableAuthentication>) {
     return this.updateAuth(auth);
+  }
+
+  // eslint-disable-next-line class-methods-use-this -- abstract method
+  _transform<T extends RecursiveRecord = RecursiveRecord, O extends BaseTemplateOptions = BaseTemplateOptions>(
+    template: BaseTemplate<T, O>,
+    params: T,
+    init?: BaseInit,
+  ) {
+    return { template, params, init };
   }
 
   // eslint-disable-next-line class-methods-use-this -- abstract method
@@ -607,6 +619,26 @@ describe('base-client.ts', () => {
       optionalBody: false,
     },
   };
+
+  describe('transform', () => {
+    it('should transform the template and params', () => {
+      expect.assertions(3);
+
+      const transformPayload: BaseTransformed = {
+        template: { ...mockTemplate, seed: { requiredQuery: 'seeded' } },
+        params: { added: 'added' },
+        init: { keepalive: true },
+      };
+
+      const transform = vi.spyOn(client, '_transform').mockReturnValueOnce(transformPayload);
+
+      const result = client._transform(mockTemplate, mockParams);
+
+      expect(transform).toHaveBeenCalledTimes(1);
+      expect(transform).toHaveBeenCalledWith(mockTemplate, mockParams);
+      expect(result).toStrictEqual(transformPayload);
+    });
+  });
 
   describe('parseBody', () => {
     it('should parse body to JSON string', () => {
