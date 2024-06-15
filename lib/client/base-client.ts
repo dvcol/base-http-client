@@ -137,6 +137,10 @@ type ClientEndpointCache<Parameter extends RecursiveRecord = Record<string, neve
   evict: (param?: Parameter, init?: BaseInit) => Promise<string | undefined>;
 } & ((param?: Parameter, init?: BaseInit, cacheOptions?: BaseCacheOption) => CancellablePromise<TypedResponse<Response>>);
 
+const nonImplementedFunction = () => {
+  throw new Error('Not implemented');
+};
+
 // eslint-disable-next-line @typescript-eslint/no-unsafe-declaration-merging
 export class ClientEndpoint<
   Parameter extends RecursiveRecord = Record<string, never>,
@@ -167,19 +171,13 @@ export class ClientEndpoint<
   }
 
   constructor(template: BaseTemplate<Parameter, Option>) {
-    this.method = template.method;
-    this.url = template.url;
-    this.opts = { cache: true, ...template.opts } as Option;
-    this.init = template.init ?? {};
-    this.body = template.body;
+    Object.keys(template).forEach(key => {
+      this[key] = template[key];
+    });
 
-    this.seed = template.seed;
-    this.validate = template.validate;
-    this.transform = template.transform;
-    this.cached = (template.opts?.cache ? this : null) as never;
-    this.resolve = () => {
-      throw new Error('Not implemented');
-    };
+    this.init = this.init ?? {};
+    this.opts = { cache: true, ...template.opts } as Option;
+    this.resolve = this.resolve ?? nonImplementedFunction;
   }
 }
 
@@ -499,7 +497,7 @@ export abstract class BaseClient<
   ): CancellablePromise<ResponseType> {
     const { template: _template = template, params: _params = params, init: _init = init } = this._transform?.(template, params, init) ?? {};
 
-    const _merged = { ..._template.seed, ...params };
+    const _merged = { ..._template.seed, ..._params };
     const _transformed = _template.transform?.(_merged) ?? _merged;
 
     _template.validate?.(_transformed);
@@ -519,7 +517,7 @@ export abstract class BaseClient<
     };
 
     if (_template.method !== HttpMethod.GET && _template.body) {
-      request.init.body = this._parseBody(_template.body, _params);
+      request.init.body = this._parseBody(_template.body, _merged);
     }
 
     const responseHandler = this._parseResponse
