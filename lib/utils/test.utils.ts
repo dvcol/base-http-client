@@ -2,7 +2,9 @@ import { expect } from 'vitest';
 
 import type { RecursiveRecord } from '@dvcol/common-utils';
 
-import { type BaseTemplate, ClientEndpoint } from '~/client/base-client';
+import type { BaseTemplate } from '~/models/base-template.model';
+
+import { ClientEndpoint } from '~/models/client-endpoint.model';
 
 export const hasTemplateProperty = (_client: ClientEndpoint | ClientEndpoint['cached'], template: BaseTemplate, recursive = true) => {
   expect(_client).toBeTypeOf('function');

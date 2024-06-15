@@ -23,24 +23,44 @@
     "node": ">=20",
     "pnpm": ">= 8"
   },
-  "require": "./dist/client/base-client.cjs",
-  "import": "./dist/client/base-client.js",
-  "types": "./dist/client/base-client.d.ts",
+  "require": "./dist/index.cjs",
+  "import": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "exports": {
     ".": {
+      "require": "./dist/index.cjs",
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./clients": {
       "require": "./dist/client/base-client.cjs",
       "import": "./dist/client/base-client.js",
       "types": "./dist/client/base-client.d.ts"
     },
+    "./models": {
+      "require": "./dist/models/index.cjs",
+      "import": "./dist/models/index.js",
+      "types": "./dist/models/index.d.ts"
+    },
+    "./utils": {
+      "require": "./dist/utils/index.cjs",
+      "import": "./dist/utils/index.js",
+      "types": "./dist/utils/index.d.ts"
+    },
+    "./utils/http": {
+      "require": "./dist/utils/http.utils.cjs",
+      "import": "./dist/utils/http.utils.js",
+      "types": "./dist/utils/http.utils.d.ts"
+    },
     "./utils/regex": {
-      "require": "./dist/utils/regex/regex.utils.cjs",
-      "import": "./dist/utils/regex/regex.utils.js",
-      "types": "./dist/utils/regex/regex.utils.d.ts"
+      "require": "./dist/utils/regex.utils.cjs",
+      "import": "./dist/utils/regex.utils.js",
+      "types": "./dist/utils/regex.utils.d.ts"
     },
     "./utils/test": {
-      "require": "./dist/utils/test/test.utils.cjs",
-      "import": "./dist/utils/test/test.utils.js",
-      "types": "./dist/utils/test/test.utils.d.ts"
+      "require": "./dist/utils/test.utils.cjs",
+      "import": "./dist/utils/test.utils.js",
+      "types": "./dist/utils/test.utils.d.ts"
     }
   },
   "files": [

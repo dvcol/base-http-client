@@ -1,22 +1,18 @@
 import { CancellableFetch, CancellablePromise, HttpMethod } from '@dvcol/common-utils';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { BaseApiHeaders, BaseClient, BaseHeaderContentType, ClientEndpoint, parseBody, parseUrl } from './base-client';
-
-import type {
-  BaseBody,
-  BaseInit,
-  BaseOptions,
-  BaseQuery,
-  BaseTemplate,
-  IApi,
-  ResponseOrTypedResponse,
-  BaseTemplateOptions,
-  BaseTransformed,
-} from './base-client';
-
 import type { CacheStore, RecursiveRecord, Updater } from '@dvcol/common-utils';
 
+import type { BaseOptions, BaseQuery, BaseTransformed } from '~/models/base-client.model';
+
+import type { BaseBody, BaseInit, BaseTemplate, BaseTemplateOptions } from '~/models/base-template.model';
+import type { IApi, ResponseOrTypedResponse } from '~/models/client-endpoint.model';
+
+import { BaseClient, parseBody, parseUrl } from '~/client/base-client';
+
+import { ClientEndpoint } from '~/models/client-endpoint.model';
+
+import { BaseApiHeaders, BaseHeaderContentType } from '~/utils/http.utils';
 import { hasOwnProperty } from '~/utils/test.utils';
 
 const mockEndpoint = 'https://api-endpoint.url';
