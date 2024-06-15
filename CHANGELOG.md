@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.8.1](https://github.com/dvcol/base-http-client/compare/v1.8.0...v1.8.1) (2024-06-15)
+
+
+### Bug Fixes
+
+* **base-client:** broaden key binding & fix body parsing ([9aa8d03](https://github.com/dvcol/base-http-client/commit/9aa8d033b966cc536e7c575ab69a137c728ffdf3))
+
 ## [1.8.0](https://github.com/dvcol/base-http-client/compare/v1.7.1...v1.8.0) (2024-06-14)
 
 
