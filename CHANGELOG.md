@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.9.0](https://github.com/dvcol/base-http-client/compare/v1.8.1...v1.9.0) (2024-06-18)
+
+
+### Features
+
+* **content-type:** support more body types and headers ([15bb03a](https://github.com/dvcol/base-http-client/commit/15bb03adc07b160bb0e83c5c0cd2064414fb3d29))
+
 ### [1.8.1](https://github.com/dvcol/base-http-client/compare/v1.8.0...v1.8.1) (2024-06-15)
 
 
