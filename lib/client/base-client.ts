@@ -248,21 +248,23 @@ export abstract class BaseClient<
         const fn: ClientEndpointCall = (param, init) => this._call(template, param, init);
 
         const cachedFn: ClientEndpointCache = getCachedFunction(fn, {
-          key: (param: Record<string, unknown>, init: Record<string, unknown>) => {
-            const _merged = { ...template.seed, ...param };
-            const _param = template?.transform?.(_merged as RecursiveRecord) ?? _merged;
-            return JSON.stringify({ template: template.config, param: _param, init });
+          key: (params: Record<string, unknown>, init: Record<string, unknown>) => {
+            const { template: _template = template, params: _params = params, init: _init = init } = this._transform?.(template, params, init) ?? {};
+            const _merged = { ..._template.seed, ..._params };
+            const _transformed = _template.transform?.(_merged) ?? _merged;
+            return JSON.stringify({ template: template.config, param: _transformed, init: _init });
           },
           cache: this._cache,
           retention: template.opts?.cache,
           evictionKey: `{"template":${JSON.stringify(template.config).replace(ExactMatchRegex, '\\$&')}`,
         });
 
-        const parseUrl = (param: Record<string, unknown> = {}) => {
-          const _merged = { ...template.seed, ...param };
-          const _params = template.transform?.(_merged) ?? _merged;
-          template.validate?.(_params);
-          return this._parseUrl(template, _params);
+        const parseUrl = (params: Record<string, unknown> = {}) => {
+          const { template: _template = template, params: _params = params } = this._transform?.(template, params) ?? {};
+          const _merged = { ..._template.seed, ..._params };
+          const _transformed = _template.transform?.(_merged) ?? _merged;
+          template.validate?.(_transformed);
+          return this._parseUrl(_template, _transformed);
         };
 
         Object.entries(template).forEach(([key, value]) => {
