@@ -440,9 +440,7 @@ export abstract class BaseClient<
 }
 
 /**
- * Parses body from a template and stringifies a {@link BodyInit}
- *
- * @private
+ * Parses body from a template and generate a json BodyInit.
  *
  * @template T - The type of the parameters.
  *
@@ -463,6 +461,43 @@ export const parseBodyJson = <T extends RecursiveRecord = RecursiveRecord>(templ
   });
 
   return _body;
+};
+
+/**
+ * Parses body from a template and constructs a FormData BodyInit.
+ *
+ * @template T - The type of the parameters.
+ *
+ * @param template - The expected body structure.
+ * @param {T} params - The actual parameters.
+ *
+ * @returns {FormData} The parsed request body as a FormData Object.
+ */
+export const parseBodyFormData = <T extends RecursiveRecord = RecursiveRecord>(template: BaseBody<string | keyof T> = {}, params: T): FormData => {
+  const bodyJson = parseBodyJson(template, params);
+  const formData = new FormData();
+  Object.entries(bodyJson).forEach(([key, value]) => formData.append(key, value));
+  return formData;
+};
+
+/**
+ * Parses body from a template and constructs a URLSearchParams BodyInit.
+ *
+ * @template T - The type of the parameters.
+ *
+ * @param template - The expected body structure.
+ * @param {T} params - The actual parameters.
+ *
+ * @returns {URLSearchParams} The parsed request body as a URLSearchParams Object.
+ */
+export const parseBodyUrlEncoded = <T extends RecursiveRecord = RecursiveRecord>(
+  template: BaseBody<string | keyof T> = {},
+  params: T,
+): URLSearchParams => {
+  const bodyJson = parseBodyJson(template, params);
+  const urlSearchParams = new URLSearchParams();
+  Object.entries(bodyJson).forEach(([key, value]) => urlSearchParams.append(key, value));
+  return urlSearchParams;
 };
 
 /**
