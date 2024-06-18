@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.9.1](https://github.com/dvcol/base-http-client/compare/v1.9.0...v1.9.1) (2024-06-18)
+
+
+### Bug Fixes
+
+* **cache:** adds template & params transform in cache key generation ([bace3c1](https://github.com/dvcol/base-http-client/commit/bace3c186fffb054ff31bab3e43ad59c22133b54))
+
 ## [1.9.0](https://github.com/dvcol/base-http-client/compare/v1.8.1...v1.9.0) (2024-06-18)
 
 
