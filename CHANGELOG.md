@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.10.0](https://github.com/dvcol/base-http-client/compare/v1.9.1...v1.10.0) (2024-06-23)
+
+
+### Features
+
+* **base-client:** adds basic implementations of requires methods ([5bef0dd](https://github.com/dvcol/base-http-client/commit/5bef0ddd917bebf21fb1daa1ddef8711919ceb2b))
+
 ### [1.9.1](https://github.com/dvcol/base-http-client/compare/v1.9.0...v1.9.1) (2024-06-18)
 
 
