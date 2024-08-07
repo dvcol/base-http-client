@@ -47,6 +47,11 @@
       "import": "./dist/utils/index.js",
       "types": "./dist/utils/index.d.ts"
     },
+    "./utils/client": {
+      "require": "./dist/utils/client.utils.cjs",
+      "import": "./dist/utils/client.utils.js",
+      "types": "./dist/utils/client.utils.d.ts"
+    },
     "./utils/http": {
       "require": "./dist/utils/http.utils.cjs",
       "import": "./dist/utils/http.utils.js",

@@ -8,9 +8,10 @@ import type { BaseOptions, BaseQuery, BaseTransformed } from '~/models/base-clie
 import type { BaseBody, BaseInit, BaseTemplate, BaseTemplateOptions } from '~/models/base-template.model';
 import type { IApi, ResponseOrTypedResponse } from '~/models/client-endpoint.model';
 
-import { BaseClient, parseBody, parseUrl } from '~/client/base-client';
+import { BaseClient } from '~/client/base-client';
 
 import { ClientEndpoint } from '~/models/client-endpoint.model';
+import { parseBody, parseUrl } from '~/utils/client.utils';
 
 import { BaseApiHeaders, BaseHeaderContentType } from '~/utils/http.utils';
 import { hasOwnProperty } from '~/utils/test.utils';
