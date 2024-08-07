@@ -224,6 +224,18 @@ export const parseBody = <T extends RecursiveRecord = RecursiveRecord>(template:
 };
 
 /**
+ * Patches the response object to include a json method that parses the response data.
+ * @param response - The response to patch
+ * @param parseResponse - Optional function to parse the response data
+ */
+export const patchResponse = <T extends Response, D = unknown, R = unknown>(response: T, parseResponse?: (data: D) => R): T => {
+  const parsed: T = response;
+  const _json = parsed.json as T['json'];
+  parsed.json = async () => _json.bind(parsed)().then(parseResponse);
+  return parsed;
+};
+
+/**
  * Parses the parameters and constructs the URL for a  API request.
  *
  * @private

@@ -83,7 +83,7 @@
     "access": "public"
   },
   "dependencies": {
-    "@dvcol/common-utils": "^1.2.2"
+    "@dvcol/common-utils": "^1.7.0"
   },
   "devDependencies": {
     "@commitlint/cli": "^19.3.0",
