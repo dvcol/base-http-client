@@ -19,6 +19,8 @@ export const BaseApiHeaders = {
   AccessControlRequestMethod: 'Access-Control-Request-Method',
   Age: 'Age',
   Allow: 'Allow',
+  /** The authentication methods ("challenges") that might be used to gain access to a specific resource. */
+  Authenticate: 'www-authenticate',
   /** The authorization token bearer */
   Authorization: 'Authorization',
   CacheControl: 'Cache-Control',
