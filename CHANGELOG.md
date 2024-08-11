@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.12.0](https://github.com/dvcol/base-http-client/compare/v1.11.0...v1.12.0) (2024-08-11)
+
+
+### Features
+
+* **headers:** adds authenticate header to utils ([f369b5f](https://github.com/dvcol/base-http-client/commit/f369b5fab627ef2f83e070497eaf0352926b20c4))
+
 ## [1.11.0](https://github.com/dvcol/base-http-client/compare/v1.10.0...v1.11.0) (2024-08-07)
 
 
