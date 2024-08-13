@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.12.2](https://github.com/dvcol/base-http-client/compare/v1.12.1...v1.12.2) (2024-08-13)
+
+
+### Bug Fixes
+
+* **utils:** correct typo in injectCorsProxy ([c5f2e86](https://github.com/dvcol/base-http-client/commit/c5f2e862086bf3126a0f30d7fdf644ee967d19fd))
+
 ### [1.12.1](https://github.com/dvcol/base-http-client/compare/v1.12.0...v1.12.1) (2024-08-13)
 
 
