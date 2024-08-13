@@ -334,5 +334,5 @@ export const injectUrlPrefix = <P extends string, T extends { url: string }>(pre
 export const injectCorsProxyPrefix = <T extends { url: string }, S extends BaseSettings>(template: T, settings: S, mutate = false) => {
   if (!settings.corsPrefix) return template;
   const prefix = `/${settings.corsPrefix}`;
-  injectUrlPrefix(prefix, template, mutate);
+  return injectUrlPrefix(prefix, template, mutate);
 };
