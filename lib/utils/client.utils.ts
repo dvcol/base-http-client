@@ -309,17 +309,30 @@ export const parseUrl = <P extends RecursiveRecord = RecursiveRecord, O extends 
 };
 
 /**
+ * Injects a url prefix to the template URL if it is not already present.
+ *
+ * @param prefix - The prefix to inject.
+ * @param template - The template for the API endpoint.
+ * @param mutate - Whether to mutate the template or return a new one.
+ */
+export const injectUrlPrefix = <P extends string, T extends { url: string }>(prefix: P, template: T, mutate = false) => {
+  if (template.url.startsWith(prefix)) return template;
+
+  if (!mutate) return { ...template, url: `${prefix}${template.url}` };
+
+  template.url = `${prefix}${template.url}`;
+  return template;
+};
+
+/**
  * Injects the cors proxy prefix to the URL if it is not already present.
  *
  * @param template - The template for the API endpoint.
  * @param settings - The client settings.
+ * @param mutate - Whether to mutate the template or return a new one.
  */
-export const injectCorsProxyPrefix = <T extends { url: string }, S extends BaseSettings>(template: T, settings: S) => {
+export const injectCorsProxyPrefix = <T extends { url: string }, S extends BaseSettings>(template: T, settings: S, mutate = false) => {
   if (!settings.corsPrefix) return template;
-
   const prefix = `/${settings.corsPrefix}`;
-  if (template.url.startsWith(prefix)) return template;
-
-  template.url = `${prefix}${template.url}`;
-  return template;
+  injectUrlPrefix(prefix, template, mutate);
 };
