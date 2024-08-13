@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.12.1](https://github.com/dvcol/base-http-client/compare/v1.12.0...v1.12.1) (2024-08-13)
+
+
+### Bug Fixes
+
+* **utils:** inject prefix in a immutable way ([818d26b](https://github.com/dvcol/base-http-client/commit/818d26bfab711d41e6c66c57a2a4460971cfa286))
+
 ## [1.12.0](https://github.com/dvcol/base-http-client/compare/v1.11.0...v1.12.0) (2024-08-11)
 
 
