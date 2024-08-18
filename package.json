@@ -52,6 +52,16 @@
       "import": "./dist/utils/client.utils.js",
       "types": "./dist/utils/client.utils.d.ts"
     },
+    "./utils/error": {
+      "require": "./dist/utils/error.utils.cjs",
+      "import": "./dist/utils/error.utils.js",
+      "types": "./dist/utils/error.utils.d.ts"
+    },
+    "./utils/validator": {
+      "require": "./dist/utils/validator.utils.cjs",
+      "import": "./dist/utils/validator.utils.js",
+      "types": "./dist/utils/validator.utils.d.ts"
+    },
     "./utils/http": {
       "require": "./dist/utils/http.utils.cjs",
       "import": "./dist/utils/http.utils.js",
