@@ -11,6 +11,7 @@ export const ErrorTypes = {
   ApiError: 'ApiError',
   InvalidParameterError: 'InvalidParameterError',
   PollingExpiredError: 'PollingExpiredError',
+  PollingCancelledError: 'PollingCancelledError',
   ExpiredTokenError: 'ExpiredTokenError',
   RateLimitError: 'RateLimitError',
   InvalidCsrfError: 'InvalidCsrfError',
@@ -72,9 +73,16 @@ export class InvalidParameterError extends Error {
 }
 
 export class PollingExpiredError extends Error {
-  constructor(message?: string) {
+  constructor(message: string = 'Polling expired.') {
     super(message);
     this.name = ErrorTypes.PollingExpiredError;
+  }
+}
+
+export class PollingCancelledError extends Error {
+  constructor(message: string = 'Polling cancelled.') {
+    super(message);
+    this.name = ErrorTypes.PollingCancelledError;
   }
 }
 
