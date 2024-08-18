@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.13.1](https://github.com/dvcol/base-http-client/compare/v1.13.0...v1.13.1) (2024-08-18)
+
+
+### Bug Fixes
+
+* **error:** update default messages ([b6318cd](https://github.com/dvcol/base-http-client/commit/b6318cd8fa6d207d664152dde644d720a753d962))
+
 ## [1.13.0](https://github.com/dvcol/base-http-client/compare/v1.12.2...v1.13.0) (2024-08-18)
 
 
