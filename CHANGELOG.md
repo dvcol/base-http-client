@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.14.0](https://github.com/dvcol/base-http-client/compare/v1.13.1...v1.14.0) (2024-08-20)
+
+
+### Features
+
+* **cache:** allows eviction key extension ([3b3f2c6](https://github.com/dvcol/base-http-client/commit/3b3f2c6336ba9b6af1b1e14f6e1a73a2dcc95c26))
+
 ### [1.13.1](https://github.com/dvcol/base-http-client/compare/v1.13.0...v1.13.1) (2024-08-18)
 
 
