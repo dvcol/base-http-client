@@ -5,7 +5,7 @@ import type { CacheStore, CancellablePromise, Observer, RecursiveRecord, Updater
 import type { BaseOptions, BaseQuery, BaseSettings, BaseTransformed } from '~/models/base-client.model';
 import type { BaseBody, BaseInit, BaseRequest, BaseTemplate, BaseTemplateOptions } from '~/models/base-template.model';
 
-import type { ClientEndpointCache, ClientEndpointCall, IApi } from '~/models/client-endpoint.model';
+import type { BaseCacheOption, ClientEndpointCache, ClientEndpointCall, IApi } from '~/models/client-endpoint.model';
 
 import { ClientEndpoint } from '~/models/client-endpoint.model';
 
@@ -124,11 +124,13 @@ export abstract class BaseClient<
         const fn: ClientEndpointCall = (param, init) => this._call(template, param, init);
 
         const cachedFn: ClientEndpointCache = getCachedFunction(fn, {
-          key: (params: Record<string, unknown>, init: Record<string, unknown>) => {
+          key: (params: Record<string, unknown>, init: Record<string, unknown>, cacheOptions?: BaseCacheOption) => {
             const { template: _template = template, params: _params = params, init: _init = init } = this._transform?.(template, params, init) ?? {};
             const _merged = { ..._template.seed, ..._params };
             const _transformed = _template.transform?.(_merged) ?? _merged;
-            return JSON.stringify({ template: template.config, param: _transformed, init: _init });
+            const _key = JSON.stringify({ template: template.config, param: _transformed, init: _init });
+            if (!cacheOptions?.cacheKey) return _key;
+            return typeof cacheOptions.cacheKey === 'function' ? cacheOptions.cacheKey(_key) : _key;
           },
           cache: this._cache,
           retention: template.opts?.cache,

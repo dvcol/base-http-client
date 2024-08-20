@@ -9,6 +9,7 @@ import type {
   BaseSettings,
   BaseTemplate,
   BaseTemplateOptions,
+  CacheKeyFunction,
   ClientEndpointCache,
   ClientEndpointCall,
   TypedResponse,
@@ -30,11 +31,11 @@ const cloneResponse = <T>(response: TypedResponse<T>, cache?: TypedResponse<T>['
 
 /**
  * Creates a cached function that will wrap the inner client function and store the response in a provided cache store
- * @param clientFn
- * @param key
- * @param evictionKey
- * @param cache
- * @param retention
+ * @param clientFn - the inner client function to cache
+ * @param key - the key to use for the cache
+ * @param evictionKey - the key to use for eviction of the method (all cache entries matching this key will be evicted)
+ * @param cache - the cache store to use
+ * @param retention - the default retention time for the cache
  */
 export const getCachedFunction = <
   Parameter extends RecursiveRecord = RecursiveRecord,
@@ -48,8 +49,8 @@ export const getCachedFunction = <
     cache,
     retention,
   }: {
-    key: string | ((param?: Parameter, init?: BaseInit) => string);
-    evictionKey?: string | ((param?: Parameter, init?: BaseInit) => string);
+    key: string | CacheKeyFunction<Parameter>;
+    evictionKey?: string | CacheKeyFunction<Parameter>;
     cache: CacheStore<ResponseType>;
     retention?: BaseTemplateOptions['cache'];
   },
@@ -115,7 +116,7 @@ export const getCachedFunction = <
       });
 
   const cacheFn = (param: Parameter, init: BaseInit, cacheOptions: BaseCacheOption): CancellablePromise<TypedResponse<Response>> => {
-    const cacheKey = typeof key === 'function' ? key(param, init) : key;
+    const cacheKey = typeof key === 'function' ? key(param, init, cacheOptions) : key;
     const evict = () => cache.delete(cacheKey);
 
     let innerPromise$: CancellablePromise<TypedResponse<ResponseBody>> | undefined;
@@ -136,10 +137,10 @@ export const getCachedFunction = <
     return promise$;
   };
 
-  const evictFn = async (param?: Parameter, init?: BaseInit) => {
+  const evictFn = async (param?: Parameter, init?: BaseInit, cacheOptions?: BaseCacheOption) => {
     const _key = evictionKey ?? key;
     if (!_key) return;
-    const _resolvedKey = typeof _key === 'function' ? _key(param, init) : _key;
+    const _resolvedKey = typeof _key === 'function' ? _key(param, init, cacheOptions) : _key;
     if (!_resolvedKey.trim()) return;
     await cache.clear(_resolvedKey);
     return _resolvedKey;

@@ -25,10 +25,21 @@ export interface ClientEndpoint<Parameter extends RecursiveRecord = Record<strin
   (param?: Parameter, init?: BaseInit): CancellablePromise<ResponseOrTypedResponse<Response>>;
 }
 
-export type BaseCacheOption = { force?: boolean; retention?: number; evictOnError?: boolean };
+export type CacheKeyFunction<Parameter extends RecursiveRecord = RecursiveRecord> = (
+  param?: Parameter,
+  init?: BaseInit,
+  cacheOption?: BaseCacheOption,
+) => string;
+
+export type BaseCacheOption = {
+  force?: boolean;
+  retention?: number;
+  evictOnError?: boolean;
+  cacheKey?: string | ((key: string) => string);
+};
 
 export type ClientEndpointCache<Parameter extends RecursiveRecord = Record<string, never>, Response = unknown> = {
-  evict: (param?: Parameter, init?: BaseInit) => Promise<string | undefined>;
+  evict: (param?: Parameter, init?: BaseInit, cacheOptions?: BaseCacheOption) => Promise<string | undefined>;
 } & ((param?: Parameter, init?: BaseInit, cacheOptions?: BaseCacheOption) => CancellablePromise<TypedResponse<Response>>);
 
 const nonImplementedFunction = () => {
