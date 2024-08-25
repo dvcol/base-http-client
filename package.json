@@ -1,7 +1,7 @@
 {
   "name": "@dvcol/base-http-client",
   "type": "module",
-  "version": "1.14.1",
+  "version": "1.15.0",
   "packageManager": "pnpm@9.3.0",
   "description": "A simple http client wrapper for making requests",
   "homepage": "https://github.com/dvcol/base-http-client",
