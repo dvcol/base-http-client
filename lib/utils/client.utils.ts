@@ -55,6 +55,16 @@ export const getCachedFunction = <
     retention?: BaseTemplateOptions['cache'];
   },
 ): ClientEndpointCache<Parameter, ResponseBody> => {
+  const getRetention = (cacheOptions: BaseCacheOption) => {
+    // First check if the cacheOptions passed in the function call has a retention value
+    if (cacheOptions?.retention !== undefined) return cacheOptions.retention;
+    // Then check if the template has a retention value
+    if (typeof retention === 'number') return retention;
+    if (typeof retention === 'object') return retention.retention ?? cache.retention;
+    // Else fallback to the cache store retention
+    return cache.retention;
+  };
+
   const restoreCache = async ({
     cacheKey,
     cacheOptions,
@@ -69,16 +79,17 @@ export const getCachedFunction = <
     const cached = await cache.get(cacheKey);
     if (!cached) return {};
 
-    let templateRetention = typeof retention === 'number' ? retention : undefined;
-    if (typeof retention === 'object') templateRetention = retention.retention;
-
-    const _retention = cacheOptions?.retention ?? templateRetention ?? cache.retention;
-    const expires = cached.cachedAt + _retention;
+    const _retention = getRetention(cacheOptions);
+    const expiresAt = cached.cachedAt + _retention;
+    const isExpired = (cached.evictAt ?? expiresAt) > Date.now();
     let response: TypedResponse<ResponseType>;
 
-    if (!_retention || expires > Date.now()) {
+    if (!cached.cachedAt || !_retention || isExpired) {
       response = cloneResponse<ResponseType>(cached.value, { previous: cached, current: cached, isCache: true, evict });
     }
+
+    cached.accessedAt = Date.now();
+    await cache.set(cacheKey, cached);
 
     return { cached, response };
   };
@@ -104,6 +115,7 @@ export const getCachedFunction = <
           value: cloneResponse(result) as ResponseType,
           key: cacheKey,
         };
+        if (cacheOptions?.saveRetention) cacheEntry.evictAt = cacheEntry.cachedAt + getRetention(cacheOptions);
         await cache.set(cacheKey, cacheEntry);
         result.cache = { previous: cached, current: cacheEntry, isCache: false, evict };
         return result as unknown as TypedResponse<ResponseType>;

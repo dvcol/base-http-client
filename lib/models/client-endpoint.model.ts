@@ -32,9 +32,15 @@ export type CacheKeyFunction<Parameter extends RecursiveRecord = RecursiveRecord
 ) => string;
 
 export type BaseCacheOption = {
+  /** If true, the cache will be forcefully evicted */
   force?: boolean;
+  /** The duration in milliseconds after which the cached values are ignored (computed from the cachedAt value). */
   retention?: number;
+  /** If true, the eviction date will be persisted and enforce in subsequent calls, regardless or retention context. */
+  saveRetention?: boolean;
+  /** If true, the cache will be deleted if an error occurs. */
   evictOnError?: boolean;
+  /** Overrides or complements the cache key computation. */
   cacheKey?: string | ((key: string) => string);
 };
 

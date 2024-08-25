@@ -1,4 +1,4 @@
-import { CancellableFetch, HttpMethod, Observable, ObservableState } from '@dvcol/common-utils';
+import { CacheRetention, CancellableFetch, HttpMethod, Observable, ObservableState } from '@dvcol/common-utils';
 
 import type { CacheStore, CancellablePromise, Observer, RecursiveRecord, Updater } from '@dvcol/common-utils';
 
@@ -20,6 +20,13 @@ import { ExactMatchRegex } from '~/utils/regex.utils';
  */
 const isApiTemplate = <T extends RecursiveRecord = RecursiveRecord>(template: ClientEndpoint<T> | IApi<T>): template is ClientEndpoint<T> =>
   template instanceof ClientEndpoint;
+
+const getInMemoryCache = <T extends Response>(retention = CacheRetention.Day): CacheStore<T> => {
+  const store: CacheStore<T> = new Map();
+  store.retention = retention;
+  store.evictOnError = true;
+  return store;
+};
 
 /**
  * Represents a client with common functionality.
@@ -177,7 +184,7 @@ export abstract class BaseClient<
     this._settings = settings as SettingsType;
     this._authentication = new ObservableState(authentication);
     this._callListeners = new Observable();
-    this._cache = cacheStore ?? new Map();
+    this._cache = cacheStore ?? getInMemoryCache<ResponseType>(settings.cache?.retention);
 
     Object.assign(this, this.bindToEndpoint(api));
   }

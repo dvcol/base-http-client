@@ -1,4 +1,4 @@
-import { CancellableFetch, CancellablePromise, HttpMethod } from '@dvcol/common-utils';
+import { CacheRetention, CancellableFetch, CancellablePromise, HttpMethod } from '@dvcol/common-utils';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import type { CacheStore, RecursiveRecord, Updater } from '@dvcol/common-utils';
@@ -184,7 +184,8 @@ class TestableBaseClient extends BaseClient implements IEndpoints {
 }
 
 describe('base-client.ts', () => {
-  const cacheStore: CacheStore<ResponseOrTypedResponse> = new Map();
+  const mapStore = new Map();
+  const cacheStore: CacheStore<ResponseOrTypedResponse> = mapStore;
   const spyCacheStore = {
     get: vi.spyOn(cacheStore, 'get'),
     set: vi.spyOn(cacheStore, 'set'),
@@ -258,7 +259,7 @@ describe('base-client.ts', () => {
       expect(spyCacheStore.clear).toHaveBeenCalledWith(undefined);
     });
 
-    describe('cache', () => {
+    describe('cached calls', () => {
       it('should not have cache function', async () => {
         expect.assertions(1);
 
@@ -288,8 +289,44 @@ describe('base-client.ts', () => {
         expect(result.cache?.isCache).toBeTruthy();
         expect(result.cache?.previous).toBeDefined();
         expect(result.cache?.current).toBeDefined();
+
         expect(fetch).toHaveBeenCalledTimes(1);
         expect(fetch).toHaveBeenCalledWith(new URL('/endpoint-with-cache', mockEndpoint).toString(), payload);
+      });
+
+      it('should update cache with access date', async () => {
+        expect.assertions(7);
+
+        expect(mapStore.size).toBe(0);
+
+        await client.endpointWithCache.cached();
+        await client.endpointWithCache.cached();
+        const result = await client.endpointWithCache.cached();
+
+        expect(result.cache).toBeDefined();
+
+        expect(mapStore.size).toBe(1);
+        const cachedEntry = mapStore.values().next().value;
+
+        expect(cachedEntry).toBeDefined();
+        expect(cachedEntry?.cachedAt).toBeDefined();
+        expect(cachedEntry?.accessedAt).toBeDefined();
+        expect(cachedEntry?.evictAt).toBeUndefined();
+      });
+
+      it('should persist cache with evict date', async () => {
+        expect.assertions(6);
+
+        const result = await client.endpointWithCache.cached(undefined, undefined, { retention: CacheRetention.Day, saveRetention: true });
+        expect(result.cache).toBeDefined();
+
+        expect(mapStore.size).toBe(1);
+        const cachedEntry = mapStore.values().next().value;
+
+        expect(cachedEntry).toBeDefined();
+        expect(cachedEntry?.cachedAt).toBeDefined();
+        expect(cachedEntry?.accessedAt).toBeUndefined();
+        expect(cachedEntry?.evictAt).toBeDefined();
       });
 
       it('should cancel cache calls', async () => {
