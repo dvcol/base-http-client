@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.16.0](https://github.com/dvcol/base-http-client/compare/v1.15.2...v1.16.0) (2024-08-26)
+
+
+### Features
+
+* **cache:** implement access & retention save toggles ([3921128](https://github.com/dvcol/base-http-client/commit/3921128d8046631ce3e70107c62c24ca216e9ea2))
+
 ### [1.15.2](https://github.com/dvcol/base-http-client/compare/v1.15.1...v1.15.2) (2024-08-26)
 
 ### [1.15.1](https://github.com/dvcol/base-http-client/compare/v1.15.0...v1.15.1) (2024-08-26)
