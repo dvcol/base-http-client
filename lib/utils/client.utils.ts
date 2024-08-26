@@ -88,8 +88,10 @@ export const getCachedFunction = <
       response = cloneResponse<ResponseType>(cached.value, { previous: cached, current: cached, isCache: true, evict });
     }
 
-    cached.accessedAt = Date.now();
-    await cache.set(cacheKey, cached);
+    if (cache.saveAccess) {
+      cached.accessedAt = Date.now();
+      await cache.set(cacheKey, cached);
+    }
 
     return { cached, response };
   };
@@ -115,7 +117,9 @@ export const getCachedFunction = <
           value: cloneResponse(result) as ResponseType,
           key: cacheKey,
         };
-        if (cacheOptions?.saveRetention) cacheEntry.evictAt = cacheEntry.cachedAt + getRetention(cacheOptions);
+        if (cacheOptions?.saveRetention || cache.saveRetention) {
+          cacheEntry.evictAt = cacheEntry.cachedAt + getRetention(cacheOptions);
+        }
         await cache.set(cacheKey, cacheEntry);
         result.cache = { previous: cached, current: cacheEntry, isCache: false, evict };
         return result as unknown as TypedResponse<ResponseType>;

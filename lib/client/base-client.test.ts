@@ -1,7 +1,9 @@
 import { CacheRetention, CancellableFetch, CancellablePromise, HttpMethod } from '@dvcol/common-utils';
+
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import type { CacheStore, RecursiveRecord, Updater } from '@dvcol/common-utils';
+import type { MockInstance } from 'vitest';
 
 import type { BaseOptions, BaseQuery, BaseTransformed } from '~/models/base-client.model';
 
@@ -186,12 +188,16 @@ class TestableBaseClient extends BaseClient implements IEndpoints {
 describe('base-client.ts', () => {
   const mapStore = new Map();
   const cacheStore: CacheStore<ResponseOrTypedResponse> = mapStore;
+  cacheStore.saveAccess = false;
+  cacheStore.saveRetention = false;
   const spyCacheStore = {
     get: vi.spyOn(cacheStore, 'get'),
     set: vi.spyOn(cacheStore, 'set'),
     clear: vi.spyOn(cacheStore, 'clear'),
     delete: vi.spyOn(cacheStore, 'delete'),
-  };
+    saveAccess: vi.spyOn(cacheStore, 'saveAccess', 'get'),
+    saveRetention: vi.spyOn(cacheStore, 'saveRetention', 'get'),
+  } satisfies Partial<Record<keyof typeof cacheStore, MockInstance>>;
 
   const client: TestableBaseClient = new TestableBaseClient({ endpoint: 'http://my-endpoint', cacheStore });
   const response = new Response();
@@ -298,6 +304,7 @@ describe('base-client.ts', () => {
         expect.assertions(7);
 
         expect(mapStore.size).toBe(0);
+        spyCacheStore.saveAccess.mockReturnValueOnce(true);
 
         await client.endpointWithCache.cached();
         await client.endpointWithCache.cached();
@@ -314,10 +321,26 @@ describe('base-client.ts', () => {
         expect(cachedEntry?.evictAt).toBeUndefined();
       });
 
-      it('should persist cache with evict date', async () => {
+      it('should persist cache with evict date form call', async () => {
         expect.assertions(6);
 
         const result = await client.endpointWithCache.cached(undefined, undefined, { retention: CacheRetention.Day, saveRetention: true });
+        expect(result.cache).toBeDefined();
+
+        expect(mapStore.size).toBe(1);
+        const cachedEntry = mapStore.values().next().value;
+
+        expect(cachedEntry).toBeDefined();
+        expect(cachedEntry?.cachedAt).toBeDefined();
+        expect(cachedEntry?.accessedAt).toBeUndefined();
+        expect(cachedEntry?.evictAt).toBeDefined();
+      });
+
+      it('should persist cache with evict date from store', async () => {
+        expect.assertions(6);
+
+        spyCacheStore.saveRetention.mockReturnValueOnce(true);
+        const result = await client.endpointWithCache.cached(undefined, undefined, { retention: CacheRetention.Day });
         expect(result.cache).toBeDefined();
 
         expect(mapStore.size).toBe(1);
