@@ -747,6 +747,22 @@ describe('base-client.ts', () => {
       expect(result).toBeInstanceOf(URL);
       expect(result?.toString()).toBe(`${mockEndpoint}/movies/requiredPath/popular?requiredQuery=requiredQuery&optionalQuery=optionalQuery`);
     });
+
+    it('should encode uri parameter in url', async () => {
+      expect.assertions(2);
+
+      const nestedUrl = 'https://this-is-an-url/and/should-be-encoded/';
+      const encodedUrl = encodeURIComponent(nestedUrl);
+
+      const result = parseUrl(
+        { ...mockTemplate, url: '/movies/:requiredPath/:optionalPath/popular?additional' },
+        { ...mockParams, optionalQuery: nestedUrl },
+        mockEndpoint,
+      );
+
+      expect(result).toBeInstanceOf(URL);
+      expect(result?.toString()).toBe(`${mockEndpoint}/movies/requiredPath/popular?requiredQuery=requiredQuery&optionalQuery=${encodedUrl}`);
+    });
   });
 
   describe('call', () => {

@@ -274,6 +274,7 @@ export const parseUrl = <P extends RecursiveRecord = RecursiveRecord, O extends 
   template: BaseTemplate<P, O>,
   params: P,
   base: string,
+  encode = true,
 ): URL => {
   const [pathPart, queryPart] = template.url.split('?');
 
@@ -290,6 +291,7 @@ export const parseUrl = <P extends RecursiveRecord = RecursiveRecord, O extends 
           if ((value === undefined || value === '') && template.opts?.parameters?.path?.[name] === true) {
             throw Error(`Missing mandatory path parameter: '${name}'`);
           }
+          if (value && encode) return encodeURIComponent(value);
           return value ?? '';
         }
         return segment;
