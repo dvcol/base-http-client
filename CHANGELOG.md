@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.16.2](https://github.com/dvcol/base-http-client/compare/v1.16.1...v1.16.2) (2025-04-29)
+
+
+### Bug Fixes
+
+* **parseUrl:** encode uri component by default ([c48ea03](https://github.com/dvcol/base-http-client/commit/c48ea034093bcfd94464a64c44aee50177a321d3))
+
 ### [1.16.1](https://github.com/dvcol/base-http-client/compare/v1.16.0...v1.16.1) (2024-08-26)
 
 ## [1.16.0](https://github.com/dvcol/base-http-client/compare/v1.15.2...v1.16.0) (2024-08-26)
